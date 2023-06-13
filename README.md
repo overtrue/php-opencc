@@ -16,7 +16,7 @@ $ composer require overtrue/php-opencc -vvv
 ## 使用
 
 ```php
-use Overtrue\OpenCC\OpenCC;
+use Overtrue\PHPOpenCC\OpenCC;
 
 echo OpenCC::convert('服务器', 'SIMPLIFIED_TO_TAIWAN_WITH_PHRASE'); 
 // output: 伺服器
@@ -25,8 +25,8 @@ echo OpenCC::convert('服务器', 'SIMPLIFIED_TO_TAIWAN_WITH_PHRASE');
 ### 使用策略别名
 
 ```php
-use Overtrue\OpenCC\OpenCC;
-use Overtrue\OpenCC\Strategy;
+use Overtrue\PHPOpenCC\OpenCC;
+use Overtrue\PHPOpenCC\Strategy;
 
 // 以下方法等价：
 
