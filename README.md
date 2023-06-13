@@ -2,7 +2,7 @@
 
 中文简繁转换，支持词汇级别的转换、异体字转换和地区习惯用词转换（中国大陆、台湾、香港、日本新字体）。基于 [BYVoid/OpenCC](https://github.com/BYVoid/OpenCC) 数据实现。
 
-[![Build Status](https://github.com/overtrue/php-opencc/actions/workflows/ci.yml/badge.svg)](https://github.com/overtrue/php-opencc/actions/workflows/ci.yml)
+[![Build Status](https://github.com/overtrue/php-opencc/actions/workflows/test.yml/badge.svg)](https://github.com/overtrue/php-opencc/actions/workflows/test.yml)
 [![Latest Stable Version](https://poser.pugx.org/overtrue/php-opencc/v/stable)](https://packagist.org/packages/overtrue/php-opencc)
 [![Total Downloads](https://poser.pugx.org/overtrue/php-opencc/downloads)](https://packagist.org/packages/overtrue/php-opencc)
 [![License](https://poser.pugx.org/overtrue/php-opencc/license)](https://packagist.org/packages/overtrue/php-opencc)
