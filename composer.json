@@ -22,6 +22,9 @@
         "jetbrains/phpstorm-attributes": "^1.0",
         "laravel/pint": "^1.10"
     },
+    "bin": [
+        "bin/opencc"
+    ],
     "autoload": {
         "psr-4": {
             "Overtrue\\PHPOpenCC\\": "src"

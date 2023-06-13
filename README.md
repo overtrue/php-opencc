@@ -7,13 +7,13 @@
 [![Total Downloads](https://poser.pugx.org/overtrue/php-opencc/downloads)](https://packagist.org/packages/overtrue/php-opencc)
 [![License](https://poser.pugx.org/overtrue/php-opencc/license)](https://packagist.org/packages/overtrue/php-opencc)
 
-## Installing
+## 安装
 
 ```shell
 $ composer require overtrue/php-opencc -vvv
 ```
 
-## Usage
+## 使用
 
 ```php
 use Overtrue\OpenCC\OpenCC;
@@ -66,7 +66,28 @@ echo OpenCC::convert('服务器', Strategy::SIMPLIFIED_TO_TAIWAN);
 | `JAPANESE_TO_SIMPLIFIED(JP2S)`            | 日文到简体           |
 
 
-## :heart: Sponsor me 
+### 在命令行使用
+
+```shell
+$ php vendor/bin/opencc "汉字" s2tw
+```
+
+说明：
+
+```bash
+$ php vendor/bin/opencc --help
+Description:
+  中文简繁转换，支持词汇级别的转换、异体字转换和地区习惯用词转换（中国大陆、台湾、香港、日本新字体）。
+
+Usage:
+  convert <string> [<strategy>]
+
+Arguments:
+  string                待转换的字符串
+  strategy              转换策略 [default: "SIMPLIFIED_TO_TRADITIONAL"]
+```
+
+## :heart: 赞助我 
 
 如果你喜欢我的项目并想支持它，[点击这里 :heart:](https://github.com/sponsors/overtrue)
 
@@ -77,7 +98,7 @@ Many thanks to Jetbrains for kindly providing a license for me to work on this a
 [![](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)](https://www.jetbrains.com/?from=https://github.com/overtrue)
 
 
-## Contributing
+## 参与贡献
 
 You can contribute in one of three ways:
 
