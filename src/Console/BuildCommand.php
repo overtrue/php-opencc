@@ -20,28 +20,35 @@ class BuildCommand extends Command
     const PARSED_DIR = __DIR__.'/../../data/parsed';
 
     const FILES = [
-        'HKVariants.txt',
-        'HKVariantsRevPhrases.txt',
-        'JPShinjitaiCharacters.txt',
-        'JPShinjitaiPhrases.txt',
-        'JPVariants.txt',
-        'STCharacters.txt',
-        'STPhrases.txt',
-        'TSCharacters.txt',
-        'TSPhrases.txt',
-        'TWPhrasesIT.txt',
-        'TWPhrasesName.txt',
-        'TWPhrasesOther.txt',
-        'TWVariants.txt',
-        'TWVariantsRevPhrases.txt',
+        'HKVariants',
+        'HKVariantsRevPhrases',
+        'JPShinjitaiCharacters',
+        'JPShinjitaiPhrases',
+        'JPVariants',
+        'STCharacters',
+        'STPhrases',
+        'TSCharacters',
+        'TSPhrases',
+        'TWPhrasesIT',
+        'TWPhrasesName',
+        'TWPhrasesOther',
+        'TWVariants',
+        'TWVariantsRevPhrases',
     ];
 
     const MERGE_OUTPUT_MAP = [
-        'TWPhrases.txt' => ['TWPhrasesIT.txt', 'TWPhrasesName.txt', 'TWPhrasesOther.txt'],
-        'TWVariantsRev.txt' => ['TWVariants.txt'],
-        'TWPhrasesRev.txt' => ['TWPhrases.txt'],
-        'HKVariantsRev.txt' => ['HKVariants.txt'],
-        'JPVariantsRev.txt' => ['JPVariants.txt'],
+        'TWPhrases' => ['TWPhrasesIT', 'TWPhrasesName', 'TWPhrasesOther'],
+        'TWVariantsRev' => ['TWVariants'],
+        'TWPhrasesRev' => ['TWPhrasesIT', 'TWPhrasesName', 'TWPhrasesOther'],
+        'HKVariantsRev' => ['HKVariants'],
+        'JPVariantsRev' => ['JPVariants'],
+    ];
+
+    const REVERSED_FILES = [
+        'TWVariantsRev',
+        'TWPhrasesRev',
+        'HKVariantsRev',
+        'JPVariantsRev',
     ];
 
     protected function configure(): void
@@ -54,6 +61,9 @@ class BuildCommand extends Command
             );
     }
 
+    /**
+     * @throws \Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (! file_exists(self::DICTIONARY_DIR)) {
@@ -80,6 +90,9 @@ class BuildCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function download(OutputInterface $output): void
     {
         $output->writeln('Downloading data files...');
@@ -93,66 +106,75 @@ class BuildCommand extends Command
             $output->writeln('Download failed.');
             throw $e;
         }
+
+        $output->writeln('Done.');
     }
 
     public function copy(OutputInterface $output): void
     {
-        $output->writeln('Copying data files...');
+        $output->write('Copying data files...');
         $process = Process::fromShellCommandline('cp -rf /tmp/opencc/OpenCC-master/data/dictionary/* '.self::DICTIONARY_DIR);
         $process->setTty(Process::isTtySupported());
         $process->run();
+        $output->writeln('Done.');
     }
 
     public function extract(OutputInterface $output): void
     {
-        $output->writeln('Extracting data files...');
+        $output->write('Extracting data files...');
         $process = Process::fromShellCommandline('unzip -o /tmp/opencc.zip -d /tmp/opencc');
-        $process->setTty(Process::isTtySupported());
         $process->run();
+        $output->writeln('Done.');
     }
 
     public function parse(OutputInterface $output): void
     {
         $output->writeln('Parsing dictionary files...');
 
-        foreach (self::MERGE_OUTPUT_MAP as $file => $files) {
-            $output->writeln('Merge '.$file.'...');
-            $content = '';
-
-            foreach ($files as $f) {
-                $content .= file_get_contents(sprintf('%s/%s', self::DICTIONARY_DIR, $f));
-            }
-
-            file_put_contents(self::DICTIONARY_DIR.'/'.$file, $content);
-        }
-
         $files = array_merge(self::FILES, array_keys(self::MERGE_OUTPUT_MAP));
 
         foreach ($files as $file) {
             $output->writeln('Parsing '.$file.'...');
+            $txt = sprintf('%s/%s.txt', self::DICTIONARY_DIR, $file);
+            if (file_exists($txt)) {
+                $lines = file($txt, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            } else {
+                // merge files
+                $content = '';
+                foreach (self::MERGE_OUTPUT_MAP[$file] as $f) {
+                    $content .= file_get_contents(sprintf('%s/%s.txt', self::DICTIONARY_DIR, $f));
+                }
+                $lines = array_filter(explode("\n", $content));
+            }
 
-            $lines = file(self::DICTIONARY_DIR.'/'.$file);
+            $needReverse = in_array($file, self::REVERSED_FILES, true);
 
             $words = [];
-
             foreach ($lines as $line) {
                 [$from, $to] = explode("\t", $line);
                 $to = preg_split('/\s+/', $to, -1, PREG_SPLIT_NO_EMPTY)[0] ?? null;
 
                 if (! $to) {
-                    $output->writeln('Skip '.$line);
+                    ! $to && $output->writeln('Skip '.$line);
 
                     continue;
                 }
 
+                if ($needReverse) {
+                    [$from, $to] = [$to, $from];
+                }
+
+                // 会出现重复的词条，以最后一个为准
                 $words[$from] = $to;
             }
 
             $content = sprintf('<?php return %s;', var_export($words, true));
 
-            $target = sprintf('%s/%s.php', self::PARSED_DIR, str_replace('.txt', '', $file));
+            $target = sprintf('%s/%s.php', self::PARSED_DIR, $file);
 
             file_put_contents($target, $content);
         }
+
+        $output->writeln('Done.');
     }
 }
