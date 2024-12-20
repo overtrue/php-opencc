@@ -21,5 +21,5 @@ interface ConverterInterface
      *                 ]
      *         ]
      */
-    public function convert(string $string, array $dictionaries): string;
+    public function convert(string $string, array $dictionaries): string|array;
 }

@@ -16,6 +16,9 @@ class OpenCCTest extends TestCase
 
         // convert to taiwan with phrase
         $this->assertSame('伺服器', OpenCC::convert('服务器', Strategy::SIMPLIFIED_TO_TAIWAN_WITH_PHRASE));
+
+        // convert with array
+        $this->assertSame(['漢字', '服務器'], OpenCC::convert(['汉字', '服务器']));
     }
 
     public function test_magic_call()

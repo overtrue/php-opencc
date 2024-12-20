@@ -6,11 +6,15 @@ use Overtrue\PHPOpenCC\OpenCC;
 use Overtrue\PHPOpenCC\Dictionary;
 use function Termwind\{render};
 
+// 多少个字符为一组
 $chunkSize = $argv[1] ?? 10;
+
+// 一次转换多少组
+$batchSize = $argv[2] ?? 1;
 
 $input = file_get_contents(__DIR__ . '/input.txt');
 
-$chunks = str_split($input, $chunkSize);
+$chunks = mb_str_split($input, $chunkSize);
 
 $dictionaries = array_keys(Dictionary::SETS_MAP);
 
@@ -21,7 +25,7 @@ foreach ($dictionaries as $strategy) {
 
   $start = microtime(true);
 
-  foreach ($chunks as $chunk) {
+  foreach (array_chunk($chunks, $batchSize) as $chunk) {
     OpenCC::convert($chunk, $strategy);
   }
 

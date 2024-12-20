@@ -6,8 +6,10 @@ use Overtrue\PHPOpenCC\Contracts\ConverterInterface;
 
 class Converter implements ConverterInterface
 {
-    public function convert(string $string, array $dictionaries): string
+    public function convert(string|array $input, array $dictionaries): string|array
     {
+        $isArray = is_array($input);
+
         foreach ($dictionaries as $dictionary) {
             // [['f1' => 't1'], ['f2' => 't2'], ...]
             if (is_array(reset($dictionary))) {
@@ -22,9 +24,15 @@ class Converter implements ConverterInterface
                 return mb_strlen($b) <=> mb_strlen($a);
             });
 
-            $string = strtr($string, $dictionary);
+            if ($isArray) {
+                $input = array_map(function ($str) use ($dictionary) {
+                    return strtr($str, $dictionary);
+                }, $input);
+            } else {
+                $input = strtr($input, $dictionary);
+            }
         }
 
-        return $string;
+        return $input;
     }
 }
