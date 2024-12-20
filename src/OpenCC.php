@@ -40,7 +40,7 @@ class OpenCC
 {
     public static function convert(string|array $input, string $strategy = Strategy::SIMPLIFIED_TO_TRADITIONAL): string|array
     {
-        $converter = new Converter();
+        $converter = new Converter;
 
         return $converter->convert($input, Dictionary::get($strategy));
     }
