@@ -20,7 +20,8 @@
         "phpunit/phpunit": "^9.0",
         "vimeo/psalm": "^4.10",
         "jetbrains/phpstorm-attributes": "^1.0",
-        "laravel/pint": "^0.1|^1.10"
+        "laravel/pint": "^0.1|^1.10",
+        "nunomaduro/termwind": "^1.15"
     },
     "bin": [
         "bin/opencc"
