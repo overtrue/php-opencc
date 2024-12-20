@@ -10,7 +10,7 @@
 ## 安装
 
 ```shell
-$ composer require overtrue/php-opencc -vvv
+composer require overtrue/php-opencc -vvv
 ```
 
 ## 使用
@@ -18,8 +18,12 @@ $ composer require overtrue/php-opencc -vvv
 ```php
 use Overtrue\PHPOpenCC\OpenCC;
 
-echo OpenCC::convert('服务器', 'SIMPLIFIED_TO_TAIWAN_WITH_PHRASE'); 
+echo OpenCC::convert('服务器', 'SIMPLIFIED_TO_TAIWAN_WITH_PHRASE');
 // output: 伺服器
+
+// 批量转换
+OpenCC::convert(['程序员', '服务器'], 'SIMPLIFIED_TO_TAIWAN_WITH_PHRASE');
+// output: ['程式設計師', '伺服器']
 ```
 
 ### 使用策略别名
@@ -65,11 +69,10 @@ echo OpenCC::convert('服务器', Strategy::SIMPLIFIED_TO_TAIWAN);
 | `JAPANESE_TO_TRADITIONAL(JP2T)`           | 日文到繁体           |
 | `JAPANESE_TO_SIMPLIFIED(JP2S)`            | 日文到简体           |
 
-
 ### 在命令行使用
 
 ```shell
-$ php vendor/bin/opencc "汉字" s2tw
+php vendor/bin/opencc "汉字" s2tw
 ```
 
 说明：
@@ -87,7 +90,7 @@ Arguments:
   strategy              转换策略 [default: "SIMPLIFIED_TO_TRADITIONAL"]
 ```
 
-## :heart: 赞助我 
+## :heart: 赞助我
 
 如果你喜欢我的项目并想支持它，[点击这里 :heart:](https://github.com/sponsors/overtrue)
 
@@ -96,7 +99,6 @@ Arguments:
 Many thanks to Jetbrains for kindly providing a license for me to work on this and other open-source projects.
 
 [![](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)](https://www.jetbrains.com/?from=https://github.com/overtrue)
-
 
 ## 参与贡献
 
