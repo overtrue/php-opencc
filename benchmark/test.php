@@ -19,22 +19,26 @@ $chunks = mb_str_split($input, $chunkSize);
 $dictionaries = array_keys(Dictionary::SETS_MAP);
 
 $output = [];
+$totalMemoryStart = memory_get_usage(true);
 
 foreach ($dictionaries as $strategy) {
   echo "Testing with strategy: {$strategy}...";
 
   $start = microtime(true);
+  $memory = memory_get_usage(true);
 
   foreach (array_chunk($chunks, $batchSize) as $chunk) {
     OpenCC::convert($chunk, $strategy);
   }
 
-  $usage = round(microtime(true) - $start, 5) * 1000;
-  $avgUsagePerChunk = $usage / count($chunks);
-  $avgUsagePerChar = $usage / mb_strlen($input);
+  $memoryUsage = round((memory_get_usage(true) - $memory) / 1024 / 1024, 4); // mb
+  $timeUsage = round(microtime(true) - $start, 5) * 1000;
+  $avgUsagePerChunk = round($timeUsage / count($chunks), 5);
+  $avgUsagePerChar = round($timeUsage / mb_strlen($input), 5);
   $html[] = "<tr>
                 <td><span class=\"text-teal-500\">{$strategy}</span></td>
-                <td><span class=\"text-green-500\">{$usage} ms</span></td>
+                <td><span class=\"text-green-500\">{$memoryUsage} mb</span></td>
+                <td><span class=\"text-green-500\">{$timeUsage} ms</span></td>
                 <td><span class=\"text-green-500\">{$avgUsagePerChunk} ms</span></td>
                 <td><span class=\"text-green-500\">{$avgUsagePerChar} ms</span></td>
              </tr>
@@ -45,25 +49,35 @@ foreach ($dictionaries as $strategy) {
 $html = implode("\n", $html);
 $chunksCount = count($chunks);
 $textLength = mb_strlen($input);
+$totalMemoryUsage = round((memory_get_usage(true) - $totalMemoryStart) / 1024 / 1024, 4); // mb
+$peakMemoryUsage = round(memory_get_peak_usage(true) / 1024 / 1024, 4); // mb
 
 render(<<<"HTML"
     <div class="m-2">
-        <div class="px-1 bg-green-600 text-white">PHP OpenCC</div>
-
-        <div class="py-1">
-            Converted <span class="text-teal-500">{$textLength}</span> chars(<span class="text-teal-500">{$chunksCount}</span> chunks/{$chunkSize} chars per chunk) with following strategies:
+        <div class="p-1">
+          <span class="text-green-600 px-1">PHP OpenCC</span>
+          <span class="px-2">benchmark test</span>
         </div>
-
         <table>
             <thead>
                 <tr>
                     <th>Strategy</th>
+                    <th>Memory Usage</th>
                     <th>Time Usage</th>
-                    <th>Avg Usage Per Chunk ({$chunkSize} chars)</th>
-                    <th>Avg Usage Per Char</th>
+                    <th>Avg Time Usage / chunk</th>
+                    <th>Avg Time Usage / char</th>
                 </tr>
             </thead>
             {$html}
         </table>
+
+        <div class="py-1">
+            <div>Total chars <span class="text-teal-500">{$textLength}</span></div>
+            <div>Split into <span class="text-teal-500">{$chunksCount}</span> chunks</div>
+            <div>Chunk size <span class="text-teal-500">{$chunkSize}</span> chars</div>
+            <div>Batch size <span class="text-teal-500">{$batchSize}</span> chunks</div>
+            <div>Memory usage <span class="text-teal-500">{$totalMemoryUsage} mb</span></div>
+            <div>Peak memory usage <span class="text-teal-500">{$peakMemoryUsage} mb</span></div>
+        </div>
     </div>
 HTML);
