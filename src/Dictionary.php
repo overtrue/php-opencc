@@ -25,6 +25,8 @@ class Dictionary
 
     const PARSED_DIR = __DIR__.'/../data/parsed';
 
+    protected static $dictionaries = [];
+
     /**
      * @return array<string, array<string, string>>
      */
@@ -34,6 +36,10 @@ class Dictionary
 
         if (! array_key_exists($set, self::SETS_MAP)) {
             throw new \InvalidArgumentException("Dictionary set [{$set}] does not exists.");
+        }
+
+        if (array_key_exists($set, self::$dictionaries)) {
+            return self::$dictionaries[$set];
         }
 
         $dictionaries = [];
@@ -49,6 +55,8 @@ class Dictionary
             }
             $dictionaries[$dictionary] = self::loadDictionary($dictionary);
         }
+
+        self::$dictionaries[$set] = $dictionaries;
 
         return $dictionaries;
     }
