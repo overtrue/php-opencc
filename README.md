@@ -48,6 +48,23 @@ echo OpenCC::convert('服务器', Strategy::S2TW);
 echo OpenCC::convert('服务器', Strategy::SIMPLIFIED_TO_TAIWAN);
 ```
 
+### 流式/文件转换（可选）
+
+```php
+use Overtrue\PHPOpenCC\StreamConverter;
+
+// 流到流
+touch('out.txt');
+$in = fopen('input.txt', 'rb');
+$out = fopen('out.txt', 'wb');
+StreamConverter::convertStream($in, $out, 'S2T');
+
+// 文件到文件
+StreamConverter::convertFile('input.txt', 'out.txt', 'S2TWP');
+```
+
+> 注意：按行转换不适用于跨行的词组替换场景。
+
 ### 转换策略
 
 | 策略 （别名）                                   | 说明              |
@@ -89,6 +106,34 @@ Arguments:
   string                待转换的字符串
   strategy              转换策略 [default: "SIMPLIFIED_TO_TRADITIONAL"]
 ```
+
+### 性能与部署建议
+
+- 强烈建议在生产环境开启并配置 Opcache，并将常用字典文件加入 `opcache.preload`，可显著降低首次调用延迟。
+  - 典型 php.ini 片段（示例）：
+    ```ini
+    opcache.enable=1
+    opcache.enable_cli=1
+    opcache.preload=/path/to/preload.php
+    ```
+  - `preload.php` 示例：
+    ```php
+    <?php
+    // 预加载常用字典，路径请根据实际部署调整
+    require __DIR__.'/vendor/autoload.php';
+    foreach ([
+        'STPhrases','STCharacters','TWVariants','HKVariants','JPVariants',
+        'TSPhrases','TSCharacters','TWPhrases','TWVariantsRev','JPVariantsRev',
+    ] as $name) {
+        require __DIR__.'/vendor/overtrue/php-opencc/data/parsed/'.$name.'.php';
+    }
+    ```
+- 本库会对字典进行“合并+按键长降序排序”的预处理并缓存于进程内存；在常驻进程（如 FPM、Swoole、RoadRunner）下复用效果更佳。
+
+### 构建工具（可移植）
+
+- `bin/opencc build` 使用纯 PHP（`ZipArchive` + 递归拷贝）下载并解析 upstream 字典，无需系统级 `curl/unzip/cp` 命令。
+- 需要的 PHP 扩展：`ext-zip`、`ext-mbstring`。
 
 ## :heart: 赞助我
 
