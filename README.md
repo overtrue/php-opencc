@@ -48,6 +48,23 @@ echo OpenCC::convert('服务器', Strategy::S2TW);
 echo OpenCC::convert('服务器', Strategy::SIMPLIFIED_TO_TAIWAN);
 ```
 
+### 流式/文件转换（可选）
+
+```php
+use Overtrue\PHPOpenCC\StreamConverter;
+
+// 流到流
+touch('out.txt');
+$in = fopen('input.txt', 'rb');
+$out = fopen('out.txt', 'wb');
+StreamConverter::convertStream($in, $out, 'S2T');
+
+// 文件到文件
+StreamConverter::convertFile('input.txt', 'out.txt', 'S2TWP');
+```
+
+> 注意：按行转换不适用于跨行的词组替换场景。
+
 ### 转换策略
 
 | 策略 （别名）                                   | 说明              |
