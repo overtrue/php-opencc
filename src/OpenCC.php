@@ -52,10 +52,11 @@ class OpenCC
             return '_'.$matches[0];
         }, lcfirst($name)));
 
-        if (! constant(Strategy::class.'::'.strtoupper($strategy))) {
+        $const = Strategy::class.'::'.strtoupper($strategy);
+        if (! defined($const)) {
             throw new \BadMethodCallException(sprintf('Method "%s" does not exist.', $strategy));
         }
 
-        return static::convert($arguments[0], constant(Strategy::class.'::'.$strategy));
+        return static::convert($arguments[0], constant($const));
     }
 }
