@@ -57,4 +57,17 @@ class ConverterExtraTest extends TestCase
         $this->assertSame('伺服器', OpenCC::convert('服务器', 'S2TWP'));
         $this->assertSame('伺服器', OpenCC::convert('服务器', Strategy::SIMPLIFIED_TO_TAIWAN_WITH_PHRASE));
     }
+
+    public function test_iterable_input_is_supported_and_returns_array(): void
+    {
+        $converter = new Converter();
+        $iterable = (function () {
+            yield 'a' => '汉字';
+            yield 'b' => '服务器';
+        })();
+
+        $result = $converter->convert($iterable, Overtrue\PHPOpenCC\Dictionary::get(Strategy::SIMPLIFIED_TO_TAIWAN_WITH_PHRASE));
+
+        $this->assertSame(['a' => '漢字', 'b' => '伺服器'], $result);
+    }
 }

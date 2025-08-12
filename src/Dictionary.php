@@ -4,7 +4,7 @@ namespace Overtrue\PHPOpenCC;
 
 class Dictionary
 {
-    const SETS_MAP = [
+    public const SETS_MAP = [
         Strategy::SIMPLIFIED_TO_TRADITIONAL => [['STPhrases', 'STCharacters']], // S2T
         Strategy::SIMPLIFIED_TO_HONGKONG => [['STPhrases', 'STCharacters'], 'HKVariants'], // S2HK
         Strategy::SIMPLIFIED_TO_JAPANESE => [['STPhrases', 'STCharacters'], 'JPVariants'], // S2JP
@@ -23,7 +23,7 @@ class Dictionary
         Strategy::JAPANESE_TO_SIMPLIFIED => [['JPShinjitaiPhrases', 'JPShinjitaiCharacters', 'JPVariantsRev'], ['TSPhrases', 'TSCharacters']], // JP2S
     ];
 
-    const PARSED_DIR = __DIR__.'/../data/parsed';
+    public const PARSED_DIR = __DIR__.'/../data/parsed';
 
     protected static $dictionaries = [];
 

@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
 class BuildCommand extends Command
 {
@@ -15,11 +14,11 @@ class BuildCommand extends Command
 
     protected static $defaultDescription = 'Build OpenCC data files.';
 
-    const DICTIONARY_DIR = __DIR__.'/../../data/dictionary';
+    public const DICTIONARY_DIR = __DIR__.'/../../data/dictionary';
 
-    const PARSED_DIR = __DIR__.'/../../data/parsed';
+    public const PARSED_DIR = __DIR__.'/../../data/parsed';
 
-    const FILES = [
+    public const FILES = [
         'HKVariants',
         'HKVariantsRevPhrases',
         'JPShinjitaiCharacters',
@@ -36,7 +35,7 @@ class BuildCommand extends Command
         'TWVariantsRevPhrases',
     ];
 
-    const MERGE_OUTPUT_MAP = [
+    public const MERGE_OUTPUT_MAP = [
         'TWPhrases' => ['TWPhrasesIT', 'TWPhrasesName', 'TWPhrasesOther'],
         'TWVariantsRev' => ['TWVariants'],
         'TWPhrasesRev' => ['TWPhrasesIT', 'TWPhrasesName', 'TWPhrasesOther'],
@@ -44,7 +43,7 @@ class BuildCommand extends Command
         'JPVariantsRev' => ['JPVariants'],
     ];
 
-    const REVERSED_FILES = [
+    public const REVERSED_FILES = [
         'TWVariantsRev',
         'TWPhrasesRev',
         'HKVariantsRev',
@@ -97,14 +96,32 @@ class BuildCommand extends Command
     {
         $output->writeln('Downloading data files...');
 
-        $zip = 'https://github.com/BYVoid/OpenCC/archive/refs/heads/master.zip';
-        try {
-            $process = Process::fromShellCommandline('curl -L -o /tmp/opencc.zip '.$zip);
-            $process->setTty(Process::isTtySupported());
-            $process->run();
-        } catch (\Exception $e) {
+        $zipUrl = 'https://github.com/BYVoid/OpenCC/archive/refs/heads/master.zip';
+        $target = '/tmp/opencc.zip';
+
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'timeout' => 60,
+                'follow_location' => 1,
+                'header' => [
+                    'User-Agent: php-opencc-builder',
+                ],
+            ],
+            'ssl' => [
+                'verify_peer' => true,
+                'verify_peer_name' => true,
+            ],
+        ]);
+
+        $data = @file_get_contents($zipUrl, false, $context);
+        if ($data === false) {
             $output->writeln('Download failed.');
-            throw $e;
+            throw new \RuntimeException('Unable to download dictionary zip.');
+        }
+
+        if (@file_put_contents($target, $data) === false) {
+            throw new \RuntimeException('Unable to write zip file to /tmp.');
         }
 
         $output->writeln('Done.');
@@ -113,17 +130,50 @@ class BuildCommand extends Command
     public function copy(OutputInterface $output): void
     {
         $output->write('Copying data files...');
-        $process = Process::fromShellCommandline('cp -rf /tmp/opencc/OpenCC-master/data/dictionary/* '.self::DICTIONARY_DIR);
-        $process->setTty(Process::isTtySupported());
-        $process->run();
+        $srcDir = '/tmp/opencc/OpenCC-master/data/dictionary';
+        $dstDir = self::DICTIONARY_DIR;
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($srcDir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $item) {
+            $targetPath = $dstDir.'/'.substr($item->getPathname(), strlen($srcDir) + 1);
+            if ($item->isDir()) {
+                if (!is_dir($targetPath)) {
+                    mkdir($targetPath, 0755, true);
+                }
+            } else {
+                $dir = dirname($targetPath);
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+                copy($item->getPathname(), $targetPath);
+            }
+        }
         $output->writeln('Done.');
     }
 
     public function extract(OutputInterface $output): void
     {
         $output->write('Extracting data files...');
-        $process = Process::fromShellCommandline('unzip -o /tmp/opencc.zip -d /tmp/opencc');
-        $process->run();
+        $zipPath = '/tmp/opencc.zip';
+        $dest = '/tmp/opencc';
+        if (!is_dir($dest)) {
+            mkdir($dest, 0755, true);
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath) !== true) {
+            throw new \RuntimeException('Unable to open downloaded zip.');
+        }
+
+        if ($zip->extractTo($dest) !== true) {
+            $zip->close();
+            throw new \RuntimeException('Unable to extract zip.');
+        }
+        $zip->close();
         $output->writeln('Done.');
     }
 

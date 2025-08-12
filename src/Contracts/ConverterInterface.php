@@ -21,5 +21,5 @@ interface ConverterInterface
      *                 ]
      *         ]
      */
-    public function convert(string $string, array $dictionaries): string|array;
+    public function convert(string|array|\Traversable $string, array $dictionaries): string|array;
 }
