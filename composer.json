@@ -12,8 +12,8 @@
         "php": ">=8.0",
         "ext-mbstring": "*",
         "ext-zip": "*",
-        "symfony/console": "^5.4|^6.3|^7.0",
-        "symfony/process": "^5.4|^6.3|^7.0"
+        "symfony/console": "^5.4|^6.3|^7.0|^8.0",
+        "symfony/process": "^5.4|^6.3|^7.0|^8.0"
     },
     "require-dev": {
         "brainmaestro/composer-git-hooks": "dev-master",

@@ -2,18 +2,19 @@
 
 namespace Overtrue\PHPOpenCC\Console;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'build',
+    description: 'Build OpenCC data files.'
+)]
 class BuildCommand extends Command
 {
-    protected static $defaultName = 'build';
-
-    protected static $defaultDescription = 'Build OpenCC data files.';
-
     public const DICTIONARY_DIR = __DIR__.'/../../data/dictionary';
 
     public const PARSED_DIR = __DIR__.'/../../data/parsed';
@@ -141,12 +142,12 @@ class BuildCommand extends Command
         foreach ($iterator as $item) {
             $targetPath = $dstDir.'/'.substr($item->getPathname(), strlen($srcDir) + 1);
             if ($item->isDir()) {
-                if (!is_dir($targetPath)) {
+                if (! is_dir($targetPath)) {
                     mkdir($targetPath, 0755, true);
                 }
             } else {
                 $dir = dirname($targetPath);
-                if (!is_dir($dir)) {
+                if (! is_dir($dir)) {
                     mkdir($dir, 0755, true);
                 }
                 copy($item->getPathname(), $targetPath);
@@ -160,11 +161,11 @@ class BuildCommand extends Command
         $output->write('Extracting data files...');
         $zipPath = '/tmp/opencc.zip';
         $dest = '/tmp/opencc';
-        if (!is_dir($dest)) {
+        if (! is_dir($dest)) {
             mkdir($dest, 0755, true);
         }
 
-        $zip = new \ZipArchive();
+        $zip = new \ZipArchive;
         if ($zip->open($zipPath) !== true) {
             throw new \RuntimeException('Unable to open downloaded zip.');
         }

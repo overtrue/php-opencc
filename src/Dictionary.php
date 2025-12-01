@@ -29,6 +29,7 @@ class Dictionary
 
     /**
      * Cache raw dictionary files (filename => array map).
+     *
      * @var array<string, array<string, string>>
      */
     protected static array $rawCache = [];
@@ -60,6 +61,7 @@ class Dictionary
                 }
                 $flattened = array_replace(...$loaded);
                 $prepared[] = self::sortByKeyLengthDesc($flattened);
+
                 continue;
             }
             $prepared[$dictionary] = self::sortByKeyLengthDesc(self::loadDictionary($dictionary));
@@ -79,7 +81,7 @@ class Dictionary
         }
 
         // cache raw content
-        if (!array_key_exists($path, self::$rawCache)) {
+        if (! array_key_exists($path, self::$rawCache)) {
             self::$rawCache[$path] = require $path;
         }
 
@@ -89,7 +91,7 @@ class Dictionary
     /**
      * Sort mapping by key length (desc), so longer phrases take precedence with strtr.
      *
-     * @param array<string,string> $map
+     * @param  array<string,string>  $map
      * @return array<string,string>
      */
     protected static function sortByKeyLengthDesc(array $map): array
