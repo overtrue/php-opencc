@@ -4,18 +4,19 @@ namespace Overtrue\PHPOpenCC\Console;
 
 use Overtrue\PHPOpenCC\OpenCC;
 use Overtrue\PHPOpenCC\Strategy;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'convert',
+    description: '中文简繁转换，支持词汇级别的转换、异体字转换和地区习惯用词转换（中国大陆、台湾、香港、日本新字体）。'
+)]
 class ConvertCommand extends Command
 {
-    protected static $defaultName = 'convert';
-
-    protected static $defaultDescription = '中文简繁转换，支持词汇级别的转换、异体字转换和地区习惯用词转换（中国大陆、台湾、香港、日本新字体）。';
-
     protected function configure(): void
     {
         $this

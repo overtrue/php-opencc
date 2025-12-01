@@ -1,7 +1,7 @@
 <?php
 
-use Overtrue\PHPOpenCC\StreamConverter;
 use Overtrue\PHPOpenCC\Strategy;
+use Overtrue\PHPOpenCC\StreamConverter;
 use PHPUnit\Framework\TestCase;
 
 class StreamConverterTest extends TestCase

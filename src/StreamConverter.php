@@ -8,16 +8,16 @@ class StreamConverter
      * Convert text from input stream to output stream line by line.
      * Note: Line-based conversion may not handle phrase replacements that span newline boundaries.
      *
-     * @param resource $inputStream  Readable stream resource
-     * @param resource $outputStream Writable stream resource
+     * @param  resource  $inputStream  Readable stream resource
+     * @param  resource  $outputStream  Writable stream resource
      */
     public static function convertStream($inputStream, $outputStream, string $strategy = Strategy::SIMPLIFIED_TO_TRADITIONAL): void
     {
-        if (!is_resource($inputStream) || !is_resource($outputStream)) {
+        if (! is_resource($inputStream) || ! is_resource($outputStream)) {
             throw new \InvalidArgumentException('Input and output must be valid stream resources.');
         }
 
-        $converter = new Converter();
+        $converter = new Converter;
         $dictionaries = Dictionary::get($strategy);
 
         while (($line = fgets($inputStream)) !== false) {

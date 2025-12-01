@@ -16,6 +16,7 @@ class Converter implements ConverterInterface
                 $input = array_map(function ($str) use ($dictionary) {
                     return strtr($str, $dictionary);
                 }, $input);
+
                 continue;
             }
 
@@ -26,6 +27,7 @@ class Converter implements ConverterInterface
                 }
                 $input = $result;
                 $isArray = true; // downstream rounds continue as array
+
                 continue;
             }
 

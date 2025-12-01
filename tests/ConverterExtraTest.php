@@ -1,7 +1,7 @@
 <?php
 
-use Overtrue\PHPOpenCC\OpenCC;
 use Overtrue\PHPOpenCC\Converter;
+use Overtrue\PHPOpenCC\OpenCC;
 use Overtrue\PHPOpenCC\Strategy;
 use PHPUnit\Framework\TestCase;
 
@@ -13,6 +13,7 @@ class ConverterExtraTest extends TestCase
         set_error_handler(function (int $errno, string $errstr) use (&$warnings) {
             // Collect warnings/notices
             $warnings[] = [$errno, $errstr];
+
             return true; // prevent output
         });
 
@@ -30,7 +31,7 @@ class ConverterExtraTest extends TestCase
 
     public function test_converter_with_grouped_dictionaries_merges_and_replaces_longest_first(): void
     {
-        $converter = new Converter();
+        $converter = new Converter;
 
         // Two groups of dictionaries; later keys should override earlier ones within a group
         $dictionaries = [
@@ -60,7 +61,7 @@ class ConverterExtraTest extends TestCase
 
     public function test_iterable_input_is_supported_and_returns_array(): void
     {
-        $converter = new Converter();
+        $converter = new Converter;
         $iterable = (function () {
             yield 'a' => '汉字';
             yield 'b' => '服务器';
