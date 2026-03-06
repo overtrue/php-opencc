@@ -41,7 +41,7 @@ class Dictionary
      */
     public static function get(string $set): array
     {
-        $set = constant(Strategy::class.'::'.strtoupper($set));
+        $set = self::resolveStrategy($set);
 
         if (! array_key_exists($set, self::SETS_MAP)) {
             throw new \InvalidArgumentException("Dictionary set [{$set}] does not exists.");
@@ -70,6 +70,16 @@ class Dictionary
         self::$dictionaries[$set] = $prepared;
 
         return $prepared;
+    }
+
+    protected static function resolveStrategy(string $set): string
+    {
+        $constant = Strategy::class.'::'.strtoupper($set);
+        if (! defined($constant)) {
+            throw new \InvalidArgumentException("Dictionary set [{$set}] does not exists.");
+        }
+
+        return constant($constant);
     }
 
     protected static function loadDictionary(string $dictionary)

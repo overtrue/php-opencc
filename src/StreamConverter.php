@@ -20,9 +20,22 @@ class StreamConverter
         $converter = new Converter;
         $dictionaries = Dictionary::get($strategy);
 
-        while (($line = fgets($inputStream)) !== false) {
+        while (true) {
+            $line = fgets($inputStream);
+            if ($line === false) {
+                if (feof($inputStream)) {
+                    break;
+                }
+
+                throw new \RuntimeException('Unable to read from input stream.');
+            }
+
             $converted = $converter->convert($line, $dictionaries);
-            fwrite($outputStream, $converted);
+            if (! is_string($converted)) {
+                throw new \RuntimeException('Converted stream content must be a string.');
+            }
+
+            self::writeAll($outputStream, $converted);
         }
     }
 
@@ -31,11 +44,11 @@ class StreamConverter
      */
     public static function convertFile(string $inputPath, string $outputPath, string $strategy = Strategy::SIMPLIFIED_TO_TRADITIONAL): void
     {
-        $in = @fopen($inputPath, 'rb');
+        $in = fopen($inputPath, 'rb');
         if ($in === false) {
             throw new \RuntimeException('Unable to open input file: '.$inputPath);
         }
-        $out = @fopen($outputPath, 'wb');
+        $out = fopen($outputPath, 'wb');
         if ($out === false) {
             fclose($in);
             throw new \RuntimeException('Unable to open output file: '.$outputPath);
@@ -46,6 +59,24 @@ class StreamConverter
         } finally {
             fclose($in);
             fclose($out);
+        }
+    }
+
+    /**
+     * @param  resource  $stream
+     */
+    protected static function writeAll($stream, string $content): void
+    {
+        $writtenTotal = 0;
+        $length = strlen($content);
+
+        while ($writtenTotal < $length) {
+            $written = fwrite($stream, substr($content, $writtenTotal));
+            if ($written === false || $written === 0) {
+                throw new \RuntimeException('Unable to write to output stream.');
+            }
+
+            $writtenTotal += $written;
         }
     }
 }

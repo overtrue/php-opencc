@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+<?php
+
+if (PHP_VERSION_ID >= 80400) {
+    fwrite(STDOUT, sprintf(
+        "Skipping Psalm on PHP %s: v4.x is incompatible with PHP >= 8.4.\n",
+        PHP_VERSION
+    ));
+
+    exit(0);
+}
+
+$arguments = array_map('escapeshellarg', array_slice($argv, 1));
+$command = 'vendor/bin/psalm '.implode(' ', $arguments);
+
+passthru($command, $exitCode);
+
+exit($exitCode);

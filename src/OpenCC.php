@@ -47,6 +47,10 @@ class OpenCC
 
     public static function __callStatic(string $name, array $arguments)
     {
+        if (! array_key_exists(0, $arguments)) {
+            throw new \InvalidArgumentException(sprintf('Method "%s" expects at least 1 argument.', $name));
+        }
+
         // s2t() => Strategy::S2T => (), simplifiedToTraditional() -> Strategy::SIMPLIFIED_TO_TRADITIONAL
         $strategy = strtoupper(preg_replace_callback('/[A-Z]/', function ($matches) {
             return '_'.$matches[0];

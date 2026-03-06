@@ -61,8 +61,8 @@
         "pint": "vendor/bin/pint ./src ./tests",
         "fix-style": "vendor/bin/pint ./src ./tests",
         "test": "phpunit --colors",
-        "psalm": "psalm --show-info=true --no-cache",
-        "psalm-fix": "psalm --no-cache --alter --issues=MissingReturnType,MissingParamType"
+        "psalm": "@php bin/psalm --show-info=true --no-cache",
+        "psalm-fix": "@php bin/psalm --no-cache --alter --issues=MissingReturnType,MissingParamType"
     },
     "scripts-descriptions": {
         "test": "Run all tests.",

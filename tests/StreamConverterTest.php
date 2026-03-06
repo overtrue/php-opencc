@@ -22,4 +22,27 @@ class StreamConverterTest extends TestCase
         fclose($in);
         fclose($out);
     }
+
+    public function test_convert_stream_should_throw_when_output_stream_is_not_writable(): void
+    {
+        $in = fopen('php://memory', 'rb+');
+        fwrite($in, "汉字\n");
+        rewind($in);
+
+        $out = fopen(__FILE__, 'rb');
+
+        set_error_handler(static function (): bool {
+            // Suppress fwrite warning; StreamConverter should turn this into RuntimeException.
+            return true;
+        });
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            StreamConverter::convertStream($in, $out, Strategy::SIMPLIFIED_TO_TRADITIONAL);
+        } finally {
+            restore_error_handler();
+            fclose($in);
+            fclose($out);
+        }
+    }
 }

@@ -29,6 +29,25 @@ class ConverterExtraTest extends TestCase
         $this->assertSame([], $warnings);
     }
 
+    public function test_magic_call_without_arguments_should_throw_without_warning(): void
+    {
+        $warnings = [];
+        set_error_handler(function (int $errno, string $errstr) use (&$warnings) {
+            $warnings[] = [$errno, $errstr];
+
+            return true;
+        });
+
+        try {
+            $this->expectException(\InvalidArgumentException::class);
+            OpenCC::s2t();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $warnings);
+    }
+
     public function test_converter_with_grouped_dictionaries_merges_and_replaces_longest_first(): void
     {
         $converter = new Converter;
@@ -57,6 +76,12 @@ class ConverterExtraTest extends TestCase
         $this->assertSame('伺服器', OpenCC::convert('服务器', 's2twp'));
         $this->assertSame('伺服器', OpenCC::convert('服务器', 'S2TWP'));
         $this->assertSame('伺服器', OpenCC::convert('服务器', Strategy::SIMPLIFIED_TO_TAIWAN_WITH_PHRASE));
+    }
+
+    public function test_invalid_strategy_should_throw_invalid_argument_exception(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        OpenCC::convert('汉字', 'foo');
     }
 
     public function test_iterable_input_is_supported_and_returns_array(): void
